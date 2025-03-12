@@ -1,0 +1,75 @@
+Image: 20250312_075310.jpg
+
+For part (i), how many faces does the cube have in total, and how many are red? Think about what makes a number even or odd.
+
+---
+
+Image: 20250312_075322.jpg
+
+Let's start with part (i). Consider this: if an ant sees an even number of red faces, how many red faces do they see? And remember, each ant sees exactly three faces total.
+
+---
+
+Image: 20250312_075338.jpg
+
+Good start with defining variables. Now, for part (i), think about what happens when an ant sees an even number of red faces. How would that affect the total count of red faces seen by all ants?
+
+---
+
+Image: 20250312_075344.jpg
+
+Good setup with your variables. Now, consider what happens when an ant sees an even number of red faces. How does this relate to the total number of ants saying "yes"?
+
+---
+
+Image: 20250312_075353.jpg
+
+You've defined your variables well. For part (i), can you count the total number of red faces that all ants see combined? Remember each face is counted exactly 4 times across all ants.
+
+---
+
+Image: 20250312_075403.jpg
+
+You're setting up good variables. Now, if an ant sees an even number of red faces, what does that mean? 0 or 2 red faces would make them say "yes." How can you count the total "yes" responses?
+
+---
+
+Image: 20250312_075422.jpg
+
+You're approaching this well with variables. Now, can you calculate how many ants would say "yes" if there are x red faces? Remember, an ant says "yes" if they see 0 or 2 red faces.
+
+---
+
+Image: 20250312_075432.jpg
+
+You're on the right track with your variables. For part (i), try calculating the total number of red faces seen by all ants combined. If each ant sees 3 faces, how many "face viewings" are there in total?
+
+---
+
+Image: 20250312_075436.jpg
+
+You're on the right track! Now you've established that there are 24 total face viewings. Can you determine how many of those viewings would be of red faces?
+
+---
+
+Image: 20250312_075447.jpg
+
+You've shown that the total number of red faces seen is 24. Now, how many ants would see an even number of red faces? Consider each possible case: 0, 2, or all 3 faces being red.
+
+---
+
+Image: 20250312_075448.jpg
+
+You've found that if the number of red faces is odd, then the number of blue faces is also odd. Now, can you use this to explain why the number of ants saying "yes" must be even?
+
+---
+
+Image: 20250312_075503.jpg
+
+You've made good progress showing the number of red faces must be even. Now, can you complete your explanation for part (i) by connecting this to why the number of ants saying "yes" must be even?
+
+---
+
+Image: 20250312_075510.jpg
+
+You've shown that the number of red faces must be even. Now, how does this relate to the ants seeing an even number of red faces? Can you connect this to why the number of "yes" answers must be even?
