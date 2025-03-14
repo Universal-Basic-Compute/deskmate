@@ -25,89 +25,35 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      // For web platform, use a different approach
-      if (kIsWeb) {
-        try {
-          // Use a public CORS proxy for web
-          final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(apiUrl)}';
-          
-          final response = await http.post(
-            Uri.parse(proxyUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: jsonEncode({
-              'message': message,
-              'username': username,
-              'character': 'DeskMate',
-            }),
-          );
+      // Simple approach that works with our service worker
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'message': message,
+          'username': username,
+          'character': 'DeskMate',
+        }),
+      );
 
-          if (response.statusCode == 200) {
-            final data = jsonDecode(response.body);
-            final botResponse = data['response'] as String;
-            
-            // Speak the response
-            await speakResponse(botResponse);
-            
-            return botResponse;
-          } else {
-            print('API error: ${response.statusCode} - ${response.body}');
-            return 'Sorry, I encountered an error. Please try again later.';
-          }
-        } catch (e) {
-          print('Web request error: $e');
-          return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
-        }
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final botResponse = data['response'] as String;
+        
+        // Speak the response
+        await speakResponse(botResponse);
+        
+        return botResponse;
       } else {
-        // For mobile platforms, use the original approach
-        try {
-          final response = await http.post(
-            Uri.parse(apiUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: jsonEncode({
-              'message': message,
-              'username': username,
-              'character': 'DeskMate',
-            }),
-          );
-
-          if (response.statusCode == 200) {
-            final data = jsonDecode(response.body);
-            final botResponse = data['response'] as String;
-            
-            // Speak the response
-            await speakResponse(botResponse);
-            
-            return botResponse;
-          } else {
-            // If direct approach fails, try using our proxy
-            final data = {
-              'message': message,
-              'username': username,
-              'character': 'DeskMate',
-            };
-            
-            final response = await ApiProxy.post(apiUrl, data);
-            final botResponse = response['response'] as String;
-            
-            // Speak the response
-            await speakResponse(botResponse);
-            
-            return botResponse;
-          }
-        } catch (e) {
-          print('Mobile request error: $e');
-          return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
-        }
+        print('API error: ${response.statusCode} - ${response.body}');
+        return 'Sorry, I encountered an error. Please try again later.';
       }
     } catch (e) {
-      print('Connection error: $e');
-      return 'Connection error: $e';
+      print('Request error: $e');
+      return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
     }
   }
 
@@ -120,80 +66,45 @@ class ChatService {
       
       _isPlaying = true;
       
-      // For web platform, use a different approach
-      if (kIsWeb) {
-        try {
-          // Use a public CORS proxy for web
-          final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(ttsApiUrl)}';
+      final response = await http.post(
+        Uri.parse(ttsApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'text': text,
+          'voiceId': 'IKne3meq5aSn9XLyUdCD',
+          'model': 'eleven_flash_v2_5'
+        }),
+      );
+      
+      if (response.statusCode == 200) {
+        if (kIsWeb) {
+          // Web platform handling
+          final blob = html.Blob([response.bodyBytes]);
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final player = html.AudioElement()
+            ..src = url
+            ..autoplay = true;
           
-          final response = await http.post(
-            Uri.parse(proxyUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: jsonEncode({
-              'text': text,
-              'voiceId': 'IKne3meq5aSn9XLyUdCD',
-              'model': 'eleven_flash_v2_5'
-            }),
-          );
-          
-          if (response.statusCode == 200) {
-            final blob = html.Blob([response.bodyBytes]);
-            final url = html.Url.createObjectUrlFromBlob(blob);
-            final player = html.AudioElement()
-              ..src = url
-              ..autoplay = true;
-            
-            player.onEnded.listen((_) {
-              html.Url.revokeObjectUrl(url);
-              _isPlaying = false;
-            });
-          } else {
-            print('TTS API failed: ${response.statusCode} - ${response.body}');
+          player.onEnded.listen((_) {
+            html.Url.revokeObjectUrl(url);
             _isPlaying = false;
-          }
-        } catch (e) {
-          print('Web TTS request error: $e');
-          _isPlaying = false;
+          });
+        } else {
+          // Mobile/desktop platform handling
+          final directory = await getTemporaryDirectory();
+          final filePath = '${directory.path}/tts_response.mp3';
+          
+          final file = File(filePath);
+          await file.writeAsBytes(response.bodyBytes);
+          
+          await audioPlayer.play(DeviceFileSource(filePath));
         }
       } else {
-        // For mobile platforms, use the original approach
-        try {
-          final response = await http.post(
-            Uri.parse(ttsApiUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: jsonEncode({
-              'text': text,
-              'voiceId': 'IKne3meq5aSn9XLyUdCD',
-              'model': 'eleven_flash_v2_5'
-            }),
-          );
-          
-          if (response.statusCode == 200) {
-            // Mobile/desktop platform handling
-            // Get temporary directory to save the audio file
-            final directory = await getTemporaryDirectory();
-            final filePath = '${directory.path}/tts_response.mp3';
-            
-            // Write the audio data to a file
-            final file = File(filePath);
-            await file.writeAsBytes(response.bodyBytes);
-            
-            // Play the audio file
-            await audioPlayer.play(DeviceFileSource(filePath));
-          } else {
-            print('TTS API failed: ${response.statusCode} - ${response.body}');
-            _isPlaying = false;
-          }
-        } catch (e) {
-          print('Mobile TTS request error: $e');
-          _isPlaying = false;
-        }
+        print('TTS API failed: ${response.statusCode} - ${response.body}');
+        _isPlaying = false;
       }
     } catch (e) {
       print('Error using TTS API: $e');
