@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io' if (dart.library.html) 'dart:html' as html;
 import 'dart:io' show File;
 import 'package:audioplayers/audioplayers.dart';
+import 'api_proxy.dart';
 
 class ChatService {
   final String apiUrl = 'https://mydeskmate.ai/api/send-message';  // Using absolute URL
@@ -24,41 +25,62 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      // Create a client that will be used for the request
-      final client = http.Client();
-      
+      // First try the direct approach with our client
       try {
-        final response = await client.post(
-          Uri.parse(apiUrl),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Origin': 'http://localhost',  // Add the origin header
-          },
-          body: jsonEncode({
-            'message': message,
-            'username': username,
-            'character': 'DeskMate',
-          }),
-        );
+        final client = http.Client();
+        try {
+          final response = await client.post(
+            Uri.parse(apiUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Origin': 'http://localhost',
+              'Access-Control-Request-Method': 'POST',
+              'Access-Control-Request-Headers': 'content-type, accept',
+            },
+            body: jsonEncode({
+              'message': message,
+              'username': username,
+              'character': 'DeskMate',
+            }),
+          );
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final botResponse = data['response'] as String;
-          
-          // Speak the response
-          await speakResponse(botResponse);
-          
-          return botResponse;
-        } else {
-          print('API error: ${response.statusCode} - ${response.body}');
-          return 'Sorry, I encountered an error. Please try again later.';
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final botResponse = data['response'] as String;
+            
+            // Speak the response
+            await speakResponse(botResponse);
+            
+            return botResponse;
+          }
+        } catch (e) {
+          print('Direct request error: $e');
+        } finally {
+          client.close();
         }
       } catch (e) {
-        print('Request error: $e');
+        print('Client error: $e');
+      }
+      
+      // If direct approach fails, try using our proxy
+      try {
+        final data = {
+          'message': message,
+          'username': username,
+          'character': 'DeskMate',
+        };
+        
+        final response = await ApiProxy.post(apiUrl, data);
+        final botResponse = response['response'] as String;
+        
+        // Speak the response
+        await speakResponse(botResponse);
+        
+        return botResponse;
+      } catch (e) {
+        print('Proxy request error: $e');
         return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
-      } finally {
-        client.close();
       }
     } catch (e) {
       print('Connection error: $e');
