@@ -4,9 +4,10 @@ const { handleCors, validateMethod } = require('./utils/common');
 module.exports = async function handler(req, res) {
   console.log('Messages API handler called');
   
-  // Handle CORS
+  // Handle CORS - this must be first!
+  // If it's an OPTIONS request, this will end the response
   if (handleCors(req, res)) {
-    console.log('CORS handled, returning early');
+    console.log('CORS handled, returning early for OPTIONS request');
     return;
   }
   

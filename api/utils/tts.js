@@ -4,12 +4,14 @@ const { handleCors, validateMethod } = require('./common');
 module.exports = async function handler(req, res) {
   console.log('TTS API handler called');
   
-  // Handle CORS and validate request method
+  // Handle CORS - this must be first!
+  // If it's an OPTIONS request, this will end the response
   if (handleCors(req, res)) {
-    console.log('CORS handled, returning early');
+    console.log('CORS handled, returning early for OPTIONS request');
     return;
   }
   
+  // Only proceed with validation after handling OPTIONS
   if (!validateMethod(req, res)) {
     console.log('Method validation failed, returning early');
     return;

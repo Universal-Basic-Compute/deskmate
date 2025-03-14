@@ -4,24 +4,17 @@ const { handleCors, validateMethod } = require('./utils/common');
 module.exports = async function handler(req, res) {
   console.log('Send Message API handler called');
   
-  // Handle CORS with explicit headers for this endpoint
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin'
-  );
-  
-  // Handle OPTIONS request directly
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  // Handle CORS - this must be first!
+  // If it's an OPTIONS request, this will end the response
+  if (handleCors(req, res)) {
+    console.log('CORS handled, returning early for OPTIONS request');
+    return;
   }
   
-  // Validate request method
-  if (req.method !== 'POST') {
+  // Only proceed with POST validation after handling OPTIONS
+  if (!validateMethod(req, res, 'POST')) {
     console.log('Method validation failed, returning early');
-    return res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   try {
