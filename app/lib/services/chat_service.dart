@@ -7,12 +7,8 @@ import 'dart:io' show File;
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
-  final String apiUrl = kIsWeb 
-      ? '/api/send-message'  // Relative URL for web
-      : 'https://mydeskmate.ai/api/send-message';  // Full URL for mobile
-  final String ttsApiUrl = kIsWeb
-      ? '/api/utils/tts'  // Relative URL for web
-      : 'https://mydeskmate.ai/api/utils/tts';  // Full URL for mobile
+  final String apiUrl = 'https://mydeskmate.ai/api/send-message';  // Always use full URL
+  final String ttsApiUrl = 'https://mydeskmate.ai/api/utils/tts';  // Always use full URL
   final AudioPlayer audioPlayer = AudioPlayer();
   bool _isPlaying = false;
 
