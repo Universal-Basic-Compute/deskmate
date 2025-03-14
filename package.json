@@ -7,13 +7,6 @@
     "api"
   ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
-  "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "build": "echo 'Please use workspace-specific build commands'"
   }
 }
