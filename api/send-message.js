@@ -142,7 +142,7 @@ module.exports = async function handler(req, res) {
     // Call LLM API to generate response
     const llmResponse = await axios({
       method: 'POST',
-      url: 'https://mydeskmate.ai/api/utils/llm',
+      url: 'https://duogaming.ai/api/utils/llm',
       headers: {
         'Content-Type': 'application/json'
       },

@@ -4,9 +4,12 @@ import 'package:http/http.dart' as http;
 class ApiProxy {
   static Future<Map<String, dynamic>> post(String url, Map<String, dynamic> data) async {
     try {
+      // Replace mydeskmate.ai with duogaming.ai in the URL if present
+      String adjustedUrl = url.replaceAll('mydeskmate.ai', 'duogaming.ai');
+      
       // Try direct request first
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse(adjustedUrl),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -20,7 +23,7 @@ class ApiProxy {
       }
       
       // If direct request fails, try using a CORS proxy
-      final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
+      final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(adjustedUrl)}';
       final proxyResponse = await http.post(
         Uri.parse(proxyUrl),
         headers: {

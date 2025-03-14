@@ -8,8 +8,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'api_proxy.dart';
 
 class ChatService {
-  final String apiUrl = 'https://mydeskmate.ai/api/send-message';  // Using absolute URL
-  final String ttsApiUrl = 'https://mydeskmate.ai/api/utils/tts';  // Using absolute URL
+  final String apiUrl = 'https://duogaming.ai/api/send-message';  // Using absolute URL
+  final String ttsApiUrl = 'https://duogaming.ai/api/utils/tts';  // Using absolute URL
   final AudioPlayer audioPlayer = AudioPlayer();
   bool _isPlaying = false;
 
@@ -27,7 +27,36 @@ class ChatService {
     try {
       // For web platform, try multiple approaches
       if (kIsWeb) {
-        // Try different CORS proxies
+        // Try direct request first, since duogaming.ai should have proper CORS setup
+        try {
+          final response = await http.post(
+            Uri.parse(apiUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({
+              'message': message,
+              'username': username,
+              'character': 'DeskMate',
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final botResponse = data['response'] as String;
+              
+            // Speak the response
+            await speakResponse(botResponse);
+              
+            return botResponse;
+          }
+        } catch (e) {
+          print('Direct request error: $e');
+          // Fall through to try proxies
+        }
+          
+        // If direct request fails, try different CORS proxies
         final proxies = [
           'https://api.allorigins.win/raw?url=${Uri.encodeComponent(apiUrl)}',
           'https://cors-anywhere.herokuapp.com/${apiUrl}',
@@ -145,7 +174,41 @@ class ChatService {
       _isPlaying = true;
       
       if (kIsWeb) {
-        // For web, try multiple proxies
+        // Try direct request first, since duogaming.ai should have proper CORS setup
+        try {
+          final response = await http.post(
+            Uri.parse(ttsApiUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({
+              'text': text,
+              'voiceId': 'IKne3meq5aSn9XLyUdCD',
+              'model': 'eleven_flash_v2_5'
+            }),
+          );
+          
+          if (response.statusCode == 200) {
+            final blob = html.Blob([response.bodyBytes]);
+            final url = html.Url.createObjectUrlFromBlob(blob);
+            final player = html.AudioElement()
+              ..src = url
+              ..autoplay = true;
+            
+            player.onEnded.listen((_) {
+              html.Url.revokeObjectUrl(url);
+              _isPlaying = false;
+            });
+            
+            return; // Success, exit the method
+          }
+        } catch (e) {
+          print('Direct TTS request error: $e');
+          // Fall through to try proxies
+        }
+        
+        // If direct request fails, try multiple proxies
         final proxies = [
           'https://api.allorigins.win/raw?url=${Uri.encodeComponent(ttsApiUrl)}',
           'https://cors-anywhere.herokuapp.com/${ttsApiUrl}',

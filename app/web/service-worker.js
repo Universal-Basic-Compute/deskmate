@@ -1,8 +1,8 @@
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   
-  // Only intercept requests to mydeskmate.ai
-  if (url.hostname === 'mydeskmate.ai') {
+  // Intercept requests to mydeskmate.ai or duogaming.ai
+  if (url.hostname === 'mydeskmate.ai' || url.hostname === 'duogaming.ai') {
     event.respondWith(
       fetch(event.request.clone(), {
         mode: 'no-cors',
