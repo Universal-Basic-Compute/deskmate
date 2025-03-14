@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "website/package.json",
+      "src": "website/next.config.js",
       "use": "@vercel/next"
     },
     {
@@ -13,7 +13,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api/$1.js"
     },
     {
       "src": "/(.*)",
