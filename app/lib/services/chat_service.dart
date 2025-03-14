@@ -25,13 +25,12 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      // Try using the API proxy service
+      // Make a direct API call without using the CORS proxy
       final response = await http.post(
-        Uri.parse('https://corsproxy.io/?${Uri.encodeComponent(apiUrl)}'),
+        Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Origin': 'https://deskmate.app',
         },
         body: jsonEncode({
           'message': message,
@@ -68,7 +67,7 @@ class ChatService {
       _isPlaying = true;
       
       if (kIsWeb) {
-        // Web platform handling
+        // Web platform handling with direct API call
         final response = await http.post(
           Uri.parse(ttsApiUrl),
           headers: {
@@ -98,7 +97,7 @@ class ChatService {
           _isPlaying = false;
         }
       } else {
-        // Mobile platform handling
+        // Mobile platform handling with direct API call
         final response = await http.post(
           Uri.parse(ttsApiUrl),
           headers: {
