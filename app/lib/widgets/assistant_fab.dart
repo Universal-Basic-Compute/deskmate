@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/chat_interface.dart';
 
 class AssistantFab extends StatelessWidget {
   const AssistantFab({super.key});
