@@ -54,18 +54,7 @@ class ChatService {
       }
     } catch (e) {
       print('Request error: $e');
-      
-      // Fallback to a simulated response if the API is unreachable
-      final fallbackResponses = [
-        'I can help you stay focused on your studies. What subject are you working on?',
-        'Taking regular breaks is important for effective studying. Have you tried the Pomodoro technique?',
-        'I\'m here to support your learning journey. What can I help you with today?',
-        'Remember to stay hydrated while studying. It helps with concentration!',
-        'If you\'re feeling stuck, try explaining the concept out loud as if you\'re teaching someone else.',
-      ];
-      
-      final random = math.Random();
-      return fallbackResponses[random.nextInt(fallbackResponses.length)];
+      return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
     }
   }
 
