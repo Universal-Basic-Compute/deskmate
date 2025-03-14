@@ -25,7 +25,41 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      // Simple approach that works with our service worker
+      // Try with no-cors mode for web
+      if (kIsWeb) {
+        try {
+          // Use a CORS proxy as a fallback
+          final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(apiUrl)}';
+          
+          final response = await http.post(
+            Uri.parse(proxyUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({
+              'message': message,
+              'username': username,
+              'character': 'DeskMate',
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final botResponse = data['response'] as String;
+            
+            // Speak the response
+            await speakResponse(botResponse);
+            
+            return botResponse;
+          }
+        } catch (e) {
+          print('CORS proxy error: $e');
+          // Continue to the direct request as fallback
+        }
+      }
+      
+      // Standard request (will work for mobile)
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {

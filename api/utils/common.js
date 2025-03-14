@@ -2,10 +2,10 @@ const setCorsHeaders = (res, req) => {
   console.log('Setting CORS headers');
   res.setHeader('Access-Control-Allow-Credentials', true);
   
-  // Allow specific origins or use the requesting origin
-  const allowedOrigins = ['http://localhost:58542', 'http://localhost:3000', 'https://mydeskmate.ai'];
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
+  // Allow all origins in development
+  const origin = req?.headers?.origin;
+  if (origin) {
+    console.log(`Request origin: ${origin}`);
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
