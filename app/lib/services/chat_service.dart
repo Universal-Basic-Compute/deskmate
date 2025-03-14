@@ -24,33 +24,44 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',  // Add CORS headers
-        },
-        body: jsonEncode({
-          'message': message,
-          'username': username,
-          'character': 'DeskMate',
-        }),
-      );
+      // Create a client that will be used for the request
+      final client = http.Client();
+      
+      try {
+        final response = await client.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Origin': 'http://localhost',  // Add the origin header
+          },
+          body: jsonEncode({
+            'message': message,
+            'username': username,
+            'character': 'DeskMate',
+          }),
+        );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final botResponse = data['response'] as String;
-        
-        // Speak the response
-        await speakResponse(botResponse);
-        
-        return botResponse;
-      } else {
-        final error = jsonDecode(response.body);
-        return 'Error: ${error['error'] ?? 'Unknown error'}';
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final botResponse = data['response'] as String;
+          
+          // Speak the response
+          await speakResponse(botResponse);
+          
+          return botResponse;
+        } else {
+          print('API error: ${response.statusCode} - ${response.body}');
+          return 'Sorry, I encountered an error. Please try again later.';
+        }
+      } catch (e) {
+        print('Request error: $e');
+        return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
+      } finally {
+        client.close();
       }
     } catch (e) {
+      print('Connection error: $e');
       return 'Connection error: $e';
     }
   }
@@ -64,22 +75,26 @@ class ChatService {
       
       _isPlaying = true;
       
-      // Call the TTS API endpoint
-      final response = await http.post(
-        Uri.parse(ttsApiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',  // Add CORS headers
-        },
-        body: jsonEncode({
-          'text': text,
-          'voiceId': 'IKne3meq5aSn9XLyUdCD', // Default ElevenLabs voice ID
-          'model': 'eleven_flash_v2_5'
-        }),
-      );
+      // Create a client for the request
+      final client = http.Client();
       
-      if (response.statusCode == 200) {
+      try {
+        // Call the TTS API endpoint
+        final response = await client.post(
+          Uri.parse(ttsApiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Origin': 'http://localhost',  // Add the origin header
+          },
+          body: jsonEncode({
+            'text': text,
+            'voiceId': 'IKne3meq5aSn9XLyUdCD', // Default ElevenLabs voice ID
+            'model': 'eleven_flash_v2_5'
+          }),
+        );
+        
+        if (response.statusCode == 200) {
         if (kIsWeb) {
           // Web platform handling
           final blob = html.Blob([response.bodyBytes]);
@@ -110,9 +125,15 @@ class ChatService {
             _isPlaying = false;
           }
         }
-      } else {
-        print('TTS API failed: ${response.statusCode} - ${response.body}');
+        } else {
+          print('TTS API failed: ${response.statusCode} - ${response.body}');
+          _isPlaying = false;
+        }
+      } catch (e) {
+        print('TTS request error: $e');
         _isPlaying = false;
+      } finally {
+        client.close();
       }
     } catch (e) {
       print('Error using TTS API: $e');
