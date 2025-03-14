@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/session_model.dart';
 import '../widgets/light_cone_gradient.dart';
 import '../theme/app_theme.dart';
+import '../widgets/chat_interface.dart';
 
 class ActiveSessionCard extends StatelessWidget {
   final SessionModel sessionModel;
@@ -90,7 +91,15 @@ class ActiveSessionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                
+                // Chat interface - NEW ADDITION
+                const SizedBox(
+                  height: 300, // Fixed height for chat
+                  child: ChatInterface(),
+                ),
+                
+                const SizedBox(height: 16),
                 // End session button with glow
                 Container(
                   decoration: BoxDecoration(

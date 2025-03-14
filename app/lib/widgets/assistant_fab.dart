@@ -19,7 +19,22 @@ class AssistantFab extends StatelessWidget {
       ),
       child: FloatingActionButton(
         onPressed: () {
-          // Open AI assistant
+          // Show a dialog with the chat interface
+          showDialog(
+            context: context,
+            builder: (context) => Dialog(
+              backgroundColor: darkGrey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: const ChatInterface(),
+              ),
+            ),
+          );
         },
         tooltip: 'Ask DeskMate',
         backgroundColor: darkGrey,

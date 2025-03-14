@@ -4,6 +4,7 @@ import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'models/session_model.dart';
 import 'models/user_model.dart';
+import 'models/message_model.dart'; // Add this import
 import 'theme/app_theme.dart';
 import 'widgets/light_cone_gradient.dart';
 
@@ -20,6 +21,7 @@ class DeskMateApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserModel()),
         ChangeNotifierProvider(create: (_) => SessionModel()),
+        ChangeNotifierProvider(create: (_) => ChatModel()), // Add this provider
       ],
       child: MaterialApp(
         title: 'DeskMate',
