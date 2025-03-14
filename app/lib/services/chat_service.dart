@@ -7,8 +7,8 @@ import 'dart:io' show File;
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
-  final String apiUrl = 'https://mydeskmate.ai/api/send-message';  // Always use full URL
-  final String ttsApiUrl = 'https://mydeskmate.ai/api/utils/tts';  // Always use full URL
+  final String apiUrl = '/api/send-message';  // Using relative URL
+  final String ttsApiUrl = '/api/utils/tts';  // Using relative URL
   final AudioPlayer audioPlayer = AudioPlayer();
   bool _isPlaying = false;
 
@@ -26,7 +26,11 @@ class ChatService {
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',  // Add CORS headers
+        },
         body: jsonEncode({
           'message': message,
           'username': username,
@@ -63,7 +67,11 @@ class ChatService {
       // Call the TTS API endpoint
       final response = await http.post(
         Uri.parse(ttsApiUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',  // Add CORS headers
+        },
         body: jsonEncode({
           'text': text,
           'voiceId': 'IKne3meq5aSn9XLyUdCD', // Default ElevenLabs voice ID
