@@ -14,14 +14,6 @@ class ActiveSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate elapsed time
-    final elapsedDuration = sessionModel.sessionStartTime != null
-        ? DateTime.now().difference(sessionModel.sessionStartTime!)
-        : Duration.zero;
-    
-    final minutes = elapsedDuration.inMinutes;
-    final seconds = elapsedDuration.inSeconds % 60;
-    
     return Container(
       margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
@@ -50,52 +42,9 @@ class ActiveSessionCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.timer, color: violetAccent),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Session in Progress',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Timer with glow effect
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: violetAccent.withOpacity(0.2),
-                        blurRadius: 15,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return violetGradient.createShader(bounds);
-                    },
-                    child: Text(
-                      '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                
-                // Chat interface - NEW ADDITION
+                // Chat interface
                 const SizedBox(
-                  height: 300, // Fixed height for chat
+                  height: 400, // Increased height since we removed other elements
                   child: ChatInterface(),
                 ),
                 
