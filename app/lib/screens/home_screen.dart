@@ -38,18 +38,20 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: BackgroundContainer(
-        child: Center(
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 24),
                 WelcomeHeader(name: userModel.name ?? ''),
                 const SizedBox(height: 48),
                 if (!sessionModel.isSessionActive)
                   SessionButton(sessionModel: sessionModel)
                 else
                   ActiveSessionCard(sessionModel: sessionModel),
+                const SizedBox(height: 24),
               ],
             ),
           ),
