@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' if (dart.library.html) 'dart:html' as html;
+import 'dart:io' show File;
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
