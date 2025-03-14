@@ -1,20 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
   final String apiUrl = 'https://duogaming.ai/api/send-message';
-  final FlutterTts flutterTts = FlutterTts();
+  final String ttsApiUrl = 'https://duogaming.ai/api/utils/tts';
+  final AudioPlayer audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
 
   ChatService() {
-    _initTts();
+    _initAudioPlayer();
   }
 
-  Future<void> _initTts() async {
-    await flutterTts.setLanguage('en-US');
-    await flutterTts.setSpeechRate(0.5);
-    await flutterTts.setVolume(1.0);
-    await flutterTts.setPitch(1.0);
+  void _initAudioPlayer() {
+    audioPlayer.onPlayerComplete.listen((event) {
+      _isPlaying = false;
+    });
   }
 
   Future<String> sendMessage(String message, String username) async {
@@ -47,10 +51,46 @@ class ChatService {
   }
 
   Future<void> speakResponse(String text) async {
-    await flutterTts.speak(text);
+    try {
+      // Cancel any ongoing speech
+      if (_isPlaying) {
+        await audioPlayer.stop();
+      }
+      
+      _isPlaying = true;
+      
+      // Call the TTS API endpoint
+      final response = await http.post(
+        Uri.parse(ttsApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'text': text,
+          'voiceId': 'IKne3meq5aSn9XLyUdCD', // Default ElevenLabs voice ID
+          'model': 'eleven_flash_v2_5'
+        }),
+      );
+      
+      if (response.statusCode == 200) {
+        // Get temporary directory to save the audio file
+        final directory = await getTemporaryDirectory();
+        final filePath = '${directory.path}/tts_response.mp3';
+        
+        // Write the audio data to a file
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        
+        // Play the audio file
+        await audioPlayer.play(DeviceFileSource(filePath));
+      } else {
+        print('TTS API failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Error using TTS API: $e');
+      _isPlaying = false;
+    }
   }
 
   void dispose() {
-    flutterTts.stop();
+    audioPlayer.dispose();
   }
 }
