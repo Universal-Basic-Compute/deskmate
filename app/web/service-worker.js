@@ -4,16 +4,8 @@ self.addEventListener('fetch', event => {
   // Only intercept requests to mydeskmate.ai
   if (url.hostname === 'mydeskmate.ai') {
     event.respondWith(
-      fetch(event.request.url, {
-        method: event.request.method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': self.location.origin,
-          'mode': 'cors',
-        },
-        body: event.request.method !== 'GET' ? event.request.clone().body : undefined,
-        mode: 'no-cors', // This is key - use no-cors mode
+      fetch(event.request.clone(), {
+        mode: 'no-cors',
       }).then(response => {
         console.log('Service worker successfully intercepted request');
         return response;
