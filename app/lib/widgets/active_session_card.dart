@@ -53,22 +53,43 @@ class ActiveSessionCard extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
+                    gradient: const LinearGradient(
+                      colors: [Colors.redAccent, Color(0xFFFF5252)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.redAccent.withOpacity(0.3),
                         blurRadius: 10,
                         spreadRadius: 1,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: ElevatedButton.icon(
-                    onPressed: () => sessionModel.endSession(),
-                    icon: const Icon(Icons.stop),
-                    label: const Text('End Session'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(200, 46),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => sessionModel.endSession(),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.stop, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'End Session',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

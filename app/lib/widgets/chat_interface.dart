@@ -103,6 +103,7 @@ class _ChatInterfaceState extends State<ChatInterface> {
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(primaryYellow),
                     strokeWidth: 2,
+                    backgroundColor: darkGrey,
                   ),
                 ),
               ),
@@ -113,23 +114,49 @@ class _ChatInterfaceState extends State<ChatInterface> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Ask DeskMate...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        filled: true,
-                        fillColor: darkGrey,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: darkGrey.withOpacity(0.5),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      onSubmitted: (_) => _sendMessage(),
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Ask DeskMate...',
+                          hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: darkGrey,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide(color: violetAccent.withOpacity(0.3), width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: const BorderSide(color: primaryYellow, width: 2),
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                        onSubmitted: (_) => _sendMessage(),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
+                      gradient: yellowOrangeGradient,
                       boxShadow: [
                         BoxShadow(
                           color: primaryYellow.withOpacity(0.3),
@@ -138,16 +165,19 @@ class _ChatInterfaceState extends State<ChatInterface> {
                         ),
                       ],
                     ),
-                    child: FloatingActionButton(
-                      onPressed: _sendMessage,
-                      backgroundColor: darkGrey,
-                      child: ShaderMask(
-                        shaderCallback: (Rect bounds) {
-                          return yellowOrangeGradient.createShader(bounds);
-                        },
-                        child: const Icon(
-                          Icons.send,
-                          color: Colors.white,
+                    child: Material(
+                      color: Colors.transparent,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: _sendMessage,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Icon(
+                            Icons.send,
+                            color: darkGrey,
+                            size: 24,
+                          ),
                         ),
                       ),
                     ),
@@ -168,13 +198,24 @@ class _ChatInterfaceState extends State<ChatInterface> {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: message.isUser ? primaryYellow : violetAccent,
+          gradient: message.isUser 
+            ? LinearGradient(
+                colors: [primaryYellow, orangeAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : LinearGradient(
+                colors: [violetAccent, Color(0xFF6A2FDF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: (message.isUser ? primaryYellow : violetAccent).withOpacity(0.3),
               blurRadius: 8,
               spreadRadius: 1,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -183,6 +224,7 @@ class _ChatInterfaceState extends State<ChatInterface> {
           style: TextStyle(
             color: message.isUser ? darkGrey : Colors.white,
             fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
