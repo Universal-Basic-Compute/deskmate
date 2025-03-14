@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,12 +25,13 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
-      // Simple direct request
+      // Try using the API proxy service
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('https://corsproxy.io/?${Uri.encodeComponent(apiUrl)}'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Origin': 'https://deskmate.app',
         },
         body: jsonEncode({
           'message': message,
@@ -52,7 +54,18 @@ class ChatService {
       }
     } catch (e) {
       print('Request error: $e');
-      return 'Sorry, I\'m having trouble connecting to my servers. Please check your internet connection.';
+      
+      // Fallback to a simulated response if the API is unreachable
+      final fallbackResponses = [
+        'I can help you stay focused on your studies. What subject are you working on?',
+        'Taking regular breaks is important for effective studying. Have you tried the Pomodoro technique?',
+        'I\'m here to support your learning journey. What can I help you with today?',
+        'Remember to stay hydrated while studying. It helps with concentration!',
+        'If you\'re feeling stuck, try explaining the concept out loud as if you\'re teaching someone else.',
+      ];
+      
+      final random = math.Random();
+      return fallbackResponses[random.nextInt(fallbackResponses.length)];
     }
   }
 

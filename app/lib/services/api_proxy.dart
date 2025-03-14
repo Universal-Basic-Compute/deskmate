@@ -7,35 +7,35 @@ class ApiProxy {
       // Replace mydeskmate.ai with duogaming.ai in the URL if present
       String adjustedUrl = url.replaceAll('mydeskmate.ai', 'duogaming.ai');
       
-      // Try direct request first
-      final response = await http.post(
-        Uri.parse(adjustedUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'http://localhost',
-        },
-        body: jsonEncode(data),
-      );
-      
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
-      
-      // If direct request fails, try using a CORS proxy
+      // Always use CORS proxy for API requests
       final proxyUrl = 'https://corsproxy.io/?${Uri.encodeComponent(adjustedUrl)}';
       final proxyResponse = await http.post(
         Uri.parse(proxyUrl),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Origin': 'http://localhost',
+          'Origin': 'https://deskmate.app',
         },
         body: jsonEncode(data),
       );
       
       if (proxyResponse.statusCode == 200) {
         return jsonDecode(proxyResponse.body);
+      }
+      
+      // If CORS proxy fails, try another proxy service
+      final backupProxyUrl = 'https://api.allorigins.win/raw?url=${Uri.encodeComponent(adjustedUrl)}';
+      final backupResponse = await http.post(
+        Uri.parse(backupProxyUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+      
+      if (backupResponse.statusCode == 200) {
+        return jsonDecode(backupResponse.body);
       }
       
       throw Exception('Failed to make API request: ${proxyResponse.statusCode}');
