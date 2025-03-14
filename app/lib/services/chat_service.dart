@@ -7,8 +7,8 @@ import 'dart:io' show File;
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
-  final String apiUrl = 'https://duogaming.ai/api/send-message';
-  final String ttsApiUrl = 'https://duogaming.ai/api/utils/tts';
+  final String apiUrl = 'https://mydeskmate.ai/api/send-message';
+  final String ttsApiUrl = 'https://mydeskmate.ai/api/utils/tts';
   final AudioPlayer audioPlayer = AudioPlayer();
   bool _isPlaying = false;
 
