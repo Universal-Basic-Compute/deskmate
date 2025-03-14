@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Color constants
 const Color primaryYellow = Color(0xFFFFD100); // Bright yellow
@@ -28,6 +29,7 @@ ThemeData appTheme() {
     brightness: Brightness.dark,
     primaryColor: primaryYellow,
     scaffoldBackgroundColor: backgroundGrey,
+    fontFamily: GoogleFonts.notoSans().fontFamily,
     appBarTheme: const AppBarTheme(
       backgroundColor: darkGrey,
       foregroundColor: primaryYellow,

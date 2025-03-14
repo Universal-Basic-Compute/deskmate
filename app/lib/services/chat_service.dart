@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) 'dart:html' as html;
 import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
@@ -71,18 +71,39 @@ class ChatService {
       );
       
       if (response.statusCode == 200) {
-        // Get temporary directory to save the audio file
-        final directory = await getTemporaryDirectory();
-        final filePath = '${directory.path}/tts_response.mp3';
-        
-        // Write the audio data to a file
-        final file = File(filePath);
-        await file.writeAsBytes(response.bodyBytes);
-        
-        // Play the audio file
-        await audioPlayer.play(DeviceFileSource(filePath));
+        if (kIsWeb) {
+          // Web platform handling
+          final blob = html.Blob([response.bodyBytes]);
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final player = html.AudioElement()
+            ..src = url
+            ..autoplay = true;
+          
+          player.onEnded.listen((_) {
+            html.Url.revokeObjectUrl(url);
+            _isPlaying = false;
+          });
+        } else {
+          // Mobile/desktop platform handling
+          try {
+            // Get temporary directory to save the audio file
+            final directory = await getTemporaryDirectory();
+            final filePath = '${directory.path}/tts_response.mp3';
+            
+            // Write the audio data to a file
+            final file = File(filePath);
+            await file.writeAsBytes(response.bodyBytes);
+            
+            // Play the audio file
+            await audioPlayer.play(DeviceFileSource(filePath));
+          } catch (e) {
+            print('Error saving or playing audio file: $e');
+            _isPlaying = false;
+          }
+        }
       } else {
         print('TTS API failed: ${response.statusCode} - ${response.body}');
+        _isPlaying = false;
       }
     } catch (e) {
       print('Error using TTS API: $e');
