@@ -111,19 +111,26 @@ module.exports = async function handler(req, res) {
           if (typeof lastUserMessage.content === 'string') {
             const textContent = lastUserMessage.content;
             lastUserMessage.content = [{ type: 'text', text: textContent }];
+          } else if (!Array.isArray(lastUserMessage.content)) {
+            // If content is neither string nor array, initialize as empty array
+            lastUserMessage.content = [];
           }
           
           // Add each image to the content array
           for (const imageData of images) {
-            console.log('Adding image to message, data length:', imageData.data.length);
-            lastUserMessage.content.push({
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: imageData.media_type || 'image/jpeg',
-                data: imageData.data
-              }
-            });
+            if (imageData && imageData.data) {
+              console.log('Adding image to message, data length:', imageData.data.length);
+              lastUserMessage.content.push({
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: imageData.media_type || 'image/jpeg',
+                  data: imageData.data
+                }
+              });
+            } else {
+              console.warn('Skipping invalid image data');
+            }
           }
           
           console.log('Updated last user message content:', 
@@ -171,13 +178,21 @@ module.exports = async function handler(req, res) {
       messages: payload.messages.map(m => ({
         role: m.role,
         content: Array.isArray(m.content) 
-          ? m.content.map(c => c.type === 'text' 
-              ? { type: 'text', length: c.text.length } 
-              : { type: c.type, source_type: c.source?.type, data_length: c.source?.data?.length || 0 })
-          : { type: 'string', length: m.content.length }
+          ? m.content.map(c => {
+              if (c.type === 'text') {
+                return { type: 'text', length: c.text?.length || 0 };
+              } else {
+                return { 
+                  type: c.type || 'unknown', 
+                  source_type: c.source?.type || 'unknown', 
+                  data_length: (c.source?.data?.length) || 0 
+                };
+              }
+            })
+          : { type: 'string', length: (typeof m.content === 'string' ? m.content.length : 0) }
       })),
       hasImages: !!images
-    }));
+    }, null, 2));
 
     // Make request to Anthropic API
     const response = await axios({
