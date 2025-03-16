@@ -4,7 +4,7 @@ const setCorsHeaders = (res, req) => {
   // Always set these headers for all responses
   res.setHeader('Access-Control-Allow-Credentials', true);
   
-  // Get the origin from the request headers
+  // Get the origin from the request headers if req exists
   const origin = req?.headers?.origin;
   if (origin) {
     console.log(`Request origin: ${origin}`);
