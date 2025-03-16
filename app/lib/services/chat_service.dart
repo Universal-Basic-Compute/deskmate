@@ -74,35 +74,29 @@ class ChatService {
       _isPlaying = true;
       
       if (kIsWeb) {
-        // Web platform handling with direct API call
-        final response = await http.post(
-          Uri.parse(ttsApiUrl),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: jsonEncode({
-            'text': text,
-            'voiceId': 'IKne3meq5aSn9XLyUdCD',
-            'model': 'eleven_flash_v2_5'
-          }),
-        ).timeout(const Duration(seconds: 10));
+        // Web platform handling with direct streaming
+        final encodedText = Uri.encodeComponent(text);
+        final url = '$ttsApiUrl?text=$encodedText&voiceId=IKne3meq5aSn9XLyUdCD&model=eleven_flash_v2_5';
+        print('Creating audio element with URL: $url');
         
-        if (response.statusCode == 200) {
-          final blob = html.Blob([response.bodyBytes]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          final player = html.AudioElement()
-            ..src = url
-            ..autoplay = true;
-          
-          player.onEnded.listen((_) {
-            html.Url.revokeObjectUrl(url);
-            _isPlaying = false;
-          });
-        } else {
-          print('TTS API failed: ${response.statusCode} - ${response.body}');
+        // Create an audio element and play it
+        final player = html.AudioElement()
+          ..src = url
+          ..autoplay = true;
+        
+        // Add event listeners
+        player.onEnded.listen((_) {
+          print('Audio playback completed');
           _isPlaying = false;
-        }
+        });
+        
+        player.onError.listen((event) {
+          print('Audio playback error: $event');
+          _isPlaying = false;
+        });
+        
+        // Start loading/playing
+        await player.play();
       } else {
         // Mobile platform handling with direct API call
         final response = await http.post(
@@ -172,6 +166,8 @@ class ChatService {
             // Send the actual request with the image data
             final uploadXhr = html.HttpRequest();
             uploadXhr.open('POST', 'https://mydeskmate.ai/api/screenshot');
+            
+            // Don't set content-type header, let the browser set it with the boundary
             
             uploadXhr.onLoad.listen((_) {
               if (uploadXhr.status == 200) {
