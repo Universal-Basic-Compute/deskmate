@@ -51,7 +51,7 @@ module.exports = async function handler(req, res) {
     // Make request to Airtable API
     const response = await axios({
       method: 'GET',
-      url: `https://api.airtable.com/v0/${baseId}/MESSAGES?maxRecords=${count}&sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${filterFormula}`,
+      url: `https://api.airtable.com/v0/${baseId}/MESSAGES?maxRecords=${count}&sort%5B0%5D%5Bfield%5D=CreatedAt&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${filterFormula}`,
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'

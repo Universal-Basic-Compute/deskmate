@@ -74,7 +74,7 @@ module.exports = async function handler(req, res) {
     const historyFilterFormula = encodeURIComponent(`AND({Email}="${username}", {Character}="${character}")`);
     const historyResponse = await axios({
       method: 'GET',
-      url: `https://api.airtable.com/v0/${airtableBaseId}/MESSAGES?maxRecords=20&sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${historyFilterFormula}`,
+      url: `https://api.airtable.com/v0/${airtableBaseId}/MESSAGES?maxRecords=20&sort%5B0%5D%5Bfield%5D=CreatedAt&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${historyFilterFormula}`,
       headers: {
         'Authorization': `Bearer ${airtableApiKey}`,
         'Content-Type': 'application/json'
