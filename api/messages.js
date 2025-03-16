@@ -46,7 +46,7 @@ module.exports = async function handler(req, res) {
     }
     
     // Construct filter formula
-    const filterFormula = encodeURIComponent(`AND({Email}="${username}", {Character}="${character}")`);
+    const filterFormula = encodeURIComponent(`{Email}="${username}"`);
     
     // Make request to Airtable API
     const response = await axios({
@@ -64,8 +64,7 @@ module.exports = async function handler(req, res) {
       timestamp: record.fields.CreatedAt,
       role: record.fields.Role,
       content: record.fields.Content,
-      username: record.fields.Email,
-      character: record.fields.Character
+      username: record.fields.Email
     }));
     
     // Sort messages by timestamp (oldest first)

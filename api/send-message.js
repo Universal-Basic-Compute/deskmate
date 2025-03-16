@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
     console.log('Processing send message request');
     
     // Extract parameters
-    const { message, username = 'anonymous', character = 'Zephyr', screenshot } = req.body;
+    const { message, username = 'anonymous', screenshot } = req.body;
     
     // Validate required parameters
     if (!message) {
@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
     }
     
     // Fetch recent conversation history (last 20 messages)
-    const historyFilterFormula = encodeURIComponent(`AND({Email}="${username}", {Character}="${character}")`);
+    const historyFilterFormula = encodeURIComponent(`{Email}="${username}"`);
     const historyResponse = await axios({
       method: 'GET',
       url: `https://api.airtable.com/v0/${airtableBaseId}/MESSAGES?maxRecords=20&sort%5B0%5D%5Bfield%5D=CreatedAt&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${historyFilterFormula}`,
@@ -101,7 +101,6 @@ module.exports = async function handler(req, res) {
           {
             fields: {
               Email: username,
-              Character: character,
               Role: 'user',
               Content: message,
               CreatedAt: timestamp
@@ -127,7 +126,6 @@ module.exports = async function handler(req, res) {
     // Log what we're sending to the LLM API
     console.log('Sending to LLM API:', {
       messageCount: messages.length,
-      character,
       hasScreenshot: !!screenshot,
       screenshotLength: screenshot ? screenshot.length : 0
     });
@@ -141,7 +139,6 @@ module.exports = async function handler(req, res) {
       },
       data: {
         messages,
-        character,  // Pass the character name to the LLM API
         images: screenshot ? [
           {
             data: screenshot,
@@ -172,7 +169,6 @@ module.exports = async function handler(req, res) {
           {
             fields: {
               Email: username,
-              Character: character,
               Role: 'assistant',
               Content: botResponse,
               CreatedAt: new Date().toISOString()
