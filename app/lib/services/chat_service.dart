@@ -10,7 +10,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 class ChatService {
   final String apiUrl = 'https://mydeskmate.ai/api/send-message';  // Using absolute URL
-  final String ttsApiUrl = 'https://mydeskmate.ai/api/utils/tts';  // Using absolute URL
+  final String ttsApiUrl = 'https://mydeskmate.ai/api/tts';  // Using absolute URL
   final AudioPlayer audioPlayer = AudioPlayer();
   bool _isPlaying = false;
 
