@@ -147,6 +147,47 @@ class ChatService {
     }
   }
 
+  Future<String> sendImageMessage(String imagePath, String username) async {
+    try {
+      print('Sending image to API: $imagePath');
+      
+      // Create multipart request
+      final request = http.MultipartRequest('POST', Uri.parse('https://mydeskmate.ai/api/screenshot'));
+      
+      // Add file
+      final file = await http.MultipartFile.fromPath('image', imagePath);
+      request.files.add(file);
+      
+      // Add other fields
+      request.fields['username'] = username;
+      request.fields['character'] = 'DeskMate';
+      
+      // Send request
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final botResponse = data['response'] as String? ?? 'No response received';
+        
+        // Speak the response
+        try {
+          await speakResponse(botResponse);
+        } catch (e) {
+          print('TTS error: $e');
+        }
+        
+        return botResponse;
+      } else {
+        print('API error: ${response.statusCode} - ${response.body}');
+        return 'Sorry, I encountered an error processing your image. Please try again later.';
+      }
+    } catch (e) {
+      print('Image request error: $e');
+      return 'Sorry, I\'m having trouble processing your image. Please check your internet connection.';
+    }
+  }
+
   void dispose() {
     audioPlayer.dispose();
   }

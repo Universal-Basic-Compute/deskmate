@@ -4,11 +4,13 @@ class Message {
   final String content;
   final bool isUser;
   final DateTime timestamp;
+  final String? imagePath;
 
   Message({
     required this.content,
     required this.isUser,
     required this.timestamp,
+    this.imagePath,
   });
 }
 
@@ -24,6 +26,16 @@ class ChatModel extends ChangeNotifier {
       content: content,
       isUser: isUser,
       timestamp: DateTime.now(),
+    ));
+    notifyListeners();
+  }
+
+  void addImageMessage(String imagePath, bool isUser) {
+    _messages.add(Message(
+      content: "Image",
+      isUser: isUser,
+      timestamp: DateTime.now(),
+      imagePath: imagePath,
     ));
     notifyListeners();
   }

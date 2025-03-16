@@ -20,6 +20,7 @@ dependencies:
   flutter_blue_plus: ^1.14.7
   flutter_svg: ^2.0.7
   google_fonts: ^6.1.0
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_test:

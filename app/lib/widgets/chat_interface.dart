@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
 import '../models/user_model.dart';
@@ -16,6 +18,8 @@ class _ChatInterfaceState extends State<ChatInterface> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final ScrollController _scrollController = ScrollController();
+  final ImagePicker _imagePicker = ImagePicker();
+  bool _isCapturingImage = false;
 
   @override
   void dispose() {
@@ -66,6 +70,105 @@ class _ChatInterfaceState extends State<ChatInterface> {
     // Clear loading state
     chatModel.setLoading(false);
     _scrollToBottom();
+  }
+
+  // Handle image capture
+  Future<void> _captureImage() async {
+    setState(() {
+      _isCapturingImage = true;
+    });
+
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.front,
+        imageQuality: 85,
+      );
+
+      setState(() {
+        _isCapturingImage = false;
+      });
+
+      if (image != null) {
+        // Show confirmation dialog
+        final bool shouldSend = await _showImageConfirmationDialog(image);
+        
+        if (shouldSend && mounted) {
+          final chatModel = Provider.of<ChatModel>(context, listen: false);
+          final userModel = Provider.of<UserModel>(context, listen: false);
+          
+          // Add image message to chat
+          chatModel.addImageMessage(image.path, true);
+          _scrollToBottom();
+          
+          // Set loading state
+          chatModel.setLoading(true);
+          
+          // Send image to API
+          final response = await _chatService.sendImageMessage(
+            image.path,
+            userModel.name ?? 'Student'
+          );
+          
+          // Add bot response to chat
+          chatModel.addMessage(response, false);
+          
+          // Clear loading state
+          chatModel.setLoading(false);
+          _scrollToBottom();
+        }
+      }
+    } catch (e) {
+      print('Error capturing image: $e');
+      setState(() {
+        _isCapturingImage = false;
+      });
+      
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to capture image. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Show confirmation dialog
+  Future<bool> _showImageConfirmationDialog(XFile image) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: darkGrey,
+        title: const Text('Send this image?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.file(
+              File(image.path),
+              height: 200,
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryYellow,
+              foregroundColor: darkGrey,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
 
   @override
@@ -153,6 +256,50 @@ class _ChatInterfaceState extends State<ChatInterface> {
                     ),
                   ),
                   const SizedBox(width: 8),
+                  
+                  // Camera button
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: violetGradient,
+                      boxShadow: [
+                        BoxShadow(
+                          color: violetAccent.withOpacity(0.3),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: _isCapturingImage ? null : _captureImage,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: _isCapturingImage
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(width: 8),
+                  
+                  // Send button
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -219,14 +366,24 @@ class _ChatInterfaceState extends State<ChatInterface> {
             ),
           ],
         ),
-        child: Text(
-          message.content,
-          style: TextStyle(
-            color: message.isUser ? darkGrey : Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        child: message.imagePath != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(
+                  File(message.imagePath!),
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : Text(
+                message.content,
+                style: TextStyle(
+                  color: message.isUser ? darkGrey : Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
       ),
     );
   }
