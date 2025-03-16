@@ -46,7 +46,7 @@ module.exports = async function handler(req, res) {
     }
     
     // Construct filter formula
-    const filterFormula = encodeURIComponent(`AND({Username}="${username}", {Character}="${character}")`);
+    const filterFormula = encodeURIComponent(`AND({Email}="${username}", {Character}="${character}")`);
     
     // Make request to Airtable API
     const response = await axios({
@@ -61,10 +61,10 @@ module.exports = async function handler(req, res) {
     // Extract and format the messages
     const messages = response.data.records.map(record => ({
       id: record.id,
-      timestamp: record.fields.Timestamp,
+      timestamp: record.fields.CreatedAt,
       role: record.fields.Role,
       content: record.fields.Content,
-      username: record.fields.Username,
+      username: record.fields.Email,
       character: record.fields.Character
     }));
     

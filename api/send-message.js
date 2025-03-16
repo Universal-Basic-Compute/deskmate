@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
     const endOfDay = today + 'T23:59:59.999Z';
     
     // Construct filter formula for today's messages from this user
-    const filterFormula = encodeURIComponent(`AND({Username}="${username}", {Timestamp}>="${startOfDay}", {Timestamp}<="${endOfDay}", {Role}="user")`);
+    const filterFormula = encodeURIComponent(`AND({Email}="${username}", {CreatedAt}>="${startOfDay}", {CreatedAt}<="${endOfDay}", {Role}="user")`);
     
     // Count today's messages
     const countResponse = await axios({
@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
     }
     
     // Fetch recent conversation history (last 20 messages)
-    const historyFilterFormula = encodeURIComponent(`AND({Username}="${username}", {Character}="${character}")`);
+    const historyFilterFormula = encodeURIComponent(`AND({Email}="${username}", {Character}="${character}")`);
     const historyResponse = await axios({
       method: 'GET',
       url: `https://api.airtable.com/v0/${airtableBaseId}/MESSAGES?maxRecords=20&sort%5B0%5D%5Bfield%5D=Timestamp&sort%5B0%5D%5Bdirection%5D=desc&filterByFormula=${historyFilterFormula}`,
@@ -100,11 +100,11 @@ module.exports = async function handler(req, res) {
         records: [
           {
             fields: {
-              Username: username,
+              Email: username,
               Character: character,
               Role: 'user',
               Content: message,
-              Timestamp: timestamp
+              CreatedAt: timestamp
             }
           }
         ]
@@ -171,11 +171,11 @@ module.exports = async function handler(req, res) {
         records: [
           {
             fields: {
-              Username: username,
+              Email: username,
               Character: character,
               Role: 'assistant',
               Content: botResponse,
-              Timestamp: new Date().toISOString()
+              CreatedAt: new Date().toISOString()
             }
           }
         ]
