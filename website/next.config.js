@@ -8,7 +8,9 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: '/api/:path*',
+        destination: process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:3001/api/:path*' // Local development API
+          : '/api/:path*' // Production API (handled by Vercel)
       },
     ];
   },
