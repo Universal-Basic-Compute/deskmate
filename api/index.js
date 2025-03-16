@@ -1,4 +1,4 @@
-const { handleCors } = require('./utils/common');
+const { handleCors } = require('./common');
 
 module.exports = function handler(req, res) {
   // Handle CORS

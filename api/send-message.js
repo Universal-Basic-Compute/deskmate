@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { handleCors, validateMethod } = require('./utils/common');
+const { handleCors, validateMethod } = require('./common');
 
 module.exports = async function handler(req, res) {
   console.log('Send Message API handler called');
@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
     // Call LLM API to generate response
     const llmResponse = await axios({
       method: 'POST',
-      url: '/api/llm',
+      url: `https://${req.headers.host}/api/llm`,
       headers: {
         'Content-Type': 'application/json'
       },
