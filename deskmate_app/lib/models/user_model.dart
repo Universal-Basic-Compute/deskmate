@@ -5,7 +5,6 @@ class UserModel extends ChangeNotifier {
   String? _name;
   String? _lastName;
   String? _email;
-  String? _learningStyle;
   bool _onboardingComplete = false;
   bool _isRegistering = false;
   String? _registrationError;
@@ -15,7 +14,6 @@ class UserModel extends ChangeNotifier {
   String? get name => _name;
   String? get lastName => _lastName;
   String? get email => _email;
-  String? get learningStyle => _learningStyle;
   bool get onboardingComplete => _onboardingComplete;
   bool get isRegistering => _isRegistering;
   String? get registrationError => _registrationError;
@@ -48,12 +46,10 @@ class UserModel extends ChangeNotifier {
     String? name,
     String? lastName,
     String? email,
-    String? learningStyle,
   }) async {
     _name = name;
     _lastName = lastName;
     _email = email;
-    _learningStyle = learningStyle;
     
     // Save to shared preferences
     if (_authToken != null) {
