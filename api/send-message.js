@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
     // Call LLM API to generate response
     const llmResponse = await axios({
       method: 'POST',
-      url: 'https://duogaming.ai/api/utils/llm',
+      url: '/api/llm',
       headers: {
         'Content-Type': 'application/json'
       },
