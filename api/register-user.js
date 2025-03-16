@@ -12,6 +12,15 @@ const usersTable = base('USERS');
 module.exports = async function handler(req, res) {
   console.log('Register User API handler called');
   
+  // Check for required environment variables
+  if (!process.env.AIRTABLE_API_KEY || !process.env.AIRTABLE_BASE_ID) {
+    console.error('Missing required environment variables: AIRTABLE_API_KEY or AIRTABLE_BASE_ID');
+    return res.status(500).json({
+      success: false,
+      error: 'Server configuration error'
+    });
+  }
+  
   // Handle CORS - this must be first!
   // If it's an OPTIONS request, this will end the response
   if (handleCors(req, res)) {
