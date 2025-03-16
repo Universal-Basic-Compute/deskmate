@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.deskmate"
+    namespace = "com.example.deskmate_app"  // Changed to match applicationId
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"  // Updated to latest version
 
