@@ -8,5 +8,8 @@
   ],
   "scripts": {
     "build": "echo 'Please use workspace-specific build commands'"
+  },
+  "dependencies": {
+    "formidable": "^3.5.2"
   }
 }
