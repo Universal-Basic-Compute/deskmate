@@ -13,8 +13,6 @@ class OnboardingForm extends StatefulWidget {
 class _OnboardingFormState extends State<OnboardingForm> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  String _selectedLearningStyle = 'Visual';
-  final _learningStyles = ['Visual', 'Auditory', 'Reading/Writing', 'Kinesthetic'];
   
   @override
   void dispose() {
@@ -74,43 +72,7 @@ class _OnboardingFormState extends State<OnboardingForm> {
             keyboardType: TextInputType.emailAddress,
           ),
         ),
-        const SizedBox(height: 24),
-        Text(
-          'What\'s your preferred learning style?',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: primaryYellow.withOpacity(0.05),
-                blurRadius: 10,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedLearningStyle,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.psychology),
-            ),
-            items: _learningStyles.map((style) {
-              return DropdownMenuItem(
-                value: style,
-                child: Text(style),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _selectedLearningStyle = value;
-                });
-              }
-            },
-          ),
-        ),
+        const SizedBox(height: 60),
         const SizedBox(height: 60),
         // Button with light effect
         Container(
@@ -136,7 +98,6 @@ class _OnboardingFormState extends State<OnboardingForm> {
                 userModel.setUserDetails(
                   name: _nameController.text,
                   email: _emailController.text,
-                  learningStyle: _selectedLearningStyle,
                 );
                 userModel.completeOnboarding();
               },
