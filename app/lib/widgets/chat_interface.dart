@@ -437,6 +437,20 @@ class _ChatInterfaceState extends State<ChatInterface> {
           width: 200,
           height: 200,
           fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 200,
+              height: 200,
+              color: Colors.grey[800],
+              child: const Center(
+                child: Icon(
+                  Icons.image,
+                  color: Colors.white70,
+                  size: 40,
+                ),
+              ),
+            );
+          },
         ),
       );
     }
