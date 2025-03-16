@@ -157,8 +157,8 @@ class ChatService {
         // Create a blob from the response
         final blob = html.Blob([response.bodyBytes], 'image/jpeg');
         
-        // Add the blob to the form data
-        formData.appendBlob('image', blob, 'image.jpg');
+        // Add the blob to the form data with the correct field name 'screenshot'
+        formData.appendBlob('screenshot', blob, 'image.jpg');
         
         // Add other fields
         formData.append('username', username);
@@ -205,8 +205,8 @@ class ChatService {
         // Mobile implementation - use MultipartRequest
         final request = http.MultipartRequest('POST', Uri.parse('https://mydeskmate.ai/api/screenshot'));
         
-        // Add file
-        final file = await http.MultipartFile.fromPath('image', imagePath);
+        // Add file with the correct field name 'screenshot'
+        final file = await http.MultipartFile.fromPath('screenshot', imagePath);
         request.files.add(file);
         
         // Add other fields
