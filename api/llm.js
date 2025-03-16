@@ -89,6 +89,28 @@ module.exports = async function handler(req, res) {
       // Use only non-system messages in the messages array
       payload.messages = nonSystemMessages;
       
+      // Check if any message has empty or undefined content
+      if (payload.messages.length > 0) {
+        for (let i = 0; i < payload.messages.length; i++) {
+          const msg = payload.messages[i];
+          
+          // If content is undefined or empty string, provide a default
+          if (!msg.content || (typeof msg.content === 'string' && msg.content.trim() === '')) {
+            console.warn(`Message at index ${i} has empty content, setting default content`);
+            msg.content = "I don't have any specific question, just looking for general help.";
+          }
+          
+          // If content is an empty array, add a default text item
+          if (Array.isArray(msg.content) && msg.content.length === 0) {
+            console.warn(`Message at index ${i} has empty content array, adding default content`);
+            msg.content.push({
+              type: 'text',
+              text: "I don't have any specific question, just looking for general help."
+            });
+          }
+        }
+      }
+      
       // Log if we have images
       console.log('Request body contains images:', !!images);
       if (images) {
@@ -193,6 +215,25 @@ module.exports = async function handler(req, res) {
       })),
       hasImages: !!images
     }, null, 2));
+
+    // Validate that we have valid content in all messages
+    let hasInvalidContent = false;
+    for (let i = 0; i < payload.messages.length; i++) {
+      const msg = payload.messages[i];
+      if (!msg.content || 
+          (typeof msg.content === 'string' && msg.content.trim() === '') ||
+          (Array.isArray(msg.content) && msg.content.length === 0)) {
+        hasInvalidContent = true;
+        console.error(`Invalid content in message at index ${i}:`, msg);
+      }
+    }
+
+    if (hasInvalidContent) {
+      return res.status(400).json({ 
+        error: 'Invalid message content',
+        details: 'One or more messages has empty or invalid content'
+      });
+    }
 
     // Make request to Anthropic API
     const response = await axios({
