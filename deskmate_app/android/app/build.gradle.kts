@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.deskmate"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "25.2.9519653"  // Use this specific version
+    ndkVersion = "27.0.12077973"  // Updated to latest version
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
