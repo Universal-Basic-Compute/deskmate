@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 import '../theme/app_theme.dart';
-import '../services/user_service.dart';
+import '../services/auth_service.dart';
+import '../screens/login_screen.dart';
 
 class OnboardingForm extends StatefulWidget {
   const OnboardingForm({super.key});
@@ -16,7 +17,7 @@ class _OnboardingFormState extends State<OnboardingForm> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _userService = UserService();
+  final _authService = AuthService();
   
   @override
   void dispose() {
@@ -44,7 +45,7 @@ class _OnboardingFormState extends State<OnboardingForm> {
     userModel.setRegistrationError(null);
     
     // Call the API
-    final result = await _userService.registerUser(
+    final result = await _authService.registerUser(
       firstName: _firstNameController.text,
       lastName: _lastNameController.text,
       email: _emailController.text,
@@ -229,6 +230,26 @@ class _OnboardingFormState extends State<OnboardingForm> {
                   ),
                 ),
               ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Login link
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Already have an account?"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Log In'),
+                ),
+              ],
             ),
           ],
         );
