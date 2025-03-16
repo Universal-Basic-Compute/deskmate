@@ -73,12 +73,6 @@ class ChatService {
       
       _isPlaying = true;
       
-      // Temporarily disable TTS to avoid potential crashes
-      print('TTS would speak: $text');
-      _isPlaying = false;
-      return;
-      
-      /*
       if (kIsWeb) {
         // Web platform handling with direct API call
         final response = await http.post(
@@ -140,7 +134,6 @@ class ChatService {
           _isPlaying = false;
         }
       }
-      */
     } catch (e) {
       print('Error using TTS API: $e');
       _isPlaying = false;
