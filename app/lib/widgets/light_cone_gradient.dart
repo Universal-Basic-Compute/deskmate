@@ -21,7 +21,7 @@ class LightConeGradient extends StatefulWidget {
     super.key,
     required this.child,
     this.lightColor = primaryYellow,
-    this.intensity = 0.15,
+    this.intensity = 0.08, // Reduced from 0.15
     this.alignment = Alignment.topCenter,
     this.effect = LightConeEffect.static,
     this.animationDuration = const Duration(milliseconds: 2000),
@@ -58,8 +58,8 @@ class _LightConeGradientState extends State<LightConeGradient> with SingleTicker
     switch (widget.effect) {
       case LightConeEffect.breathing:
         _intensityAnimation = Tween<double>(
-          begin: widget.intensity * 0.7,
-          end: widget.intensity * 1.3,
+          begin: widget.intensity * 0.5, // Reduced from 0.7
+          end: widget.intensity * 1.2, // Reduced from 1.3
         ).animate(CurvedAnimation(
           parent: _controller,
           curve: Curves.easeInOut,
@@ -71,13 +71,13 @@ class _LightConeGradientState extends State<LightConeGradient> with SingleTicker
           TweenSequenceItem(
             tween: Tween<double>(
               begin: widget.intensity,
-              end: widget.intensity * 1.5,
+              end: widget.intensity * 1.3, // Reduced from 1.5
             ),
             weight: 1,
           ),
           TweenSequenceItem(
             tween: Tween<double>(
-              begin: widget.intensity * 1.5,
+              begin: widget.intensity * 1.3, // Reduced from 1.5
               end: widget.intensity,
             ),
             weight: 1,

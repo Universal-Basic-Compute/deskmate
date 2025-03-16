@@ -25,9 +25,9 @@ class PlaceholderImage extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: primaryYellow.withOpacity(0.2),
-                blurRadius: 20,
-                spreadRadius: 2,
+                color: primaryYellow.withOpacity(0.1), // Reduced from 0.2
+                blurRadius: 15, // Reduced from 20
+                spreadRadius: 1, // Reduced from 2
               ),
             ],
           ),

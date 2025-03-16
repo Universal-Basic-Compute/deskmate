@@ -285,9 +285,9 @@ class _ChatInterfaceState extends State<ChatInterface> {
                       gradient: violetGradient,
                       boxShadow: [
                         BoxShadow(
-                          color: violetAccent.withOpacity(0.3),
-                          blurRadius: 12,
-                          spreadRadius: 2,
+                          color: violetAccent.withOpacity(0.15), // Reduced from 0.3
+                          blurRadius: 8, // Reduced from 12
+                          spreadRadius: 1, // Reduced from 2
                         ),
                       ],
                     ),
@@ -327,9 +327,9 @@ class _ChatInterfaceState extends State<ChatInterface> {
                       gradient: yellowOrangeGradient,
                       boxShadow: [
                         BoxShadow(
-                          color: primaryYellow.withOpacity(0.3),
-                          blurRadius: 12,
-                          spreadRadius: 2,
+                          color: primaryYellow.withOpacity(0.15), // Reduced from 0.3
+                          blurRadius: 8, // Reduced from 12
+                          spreadRadius: 1, // Reduced from 2
                         ),
                       ],
                     ),
@@ -380,10 +380,10 @@ class _ChatInterfaceState extends State<ChatInterface> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: (message.isUser ? primaryYellow : violetAccent).withOpacity(0.3),
-              blurRadius: 8,
-              spreadRadius: 1,
-              offset: const Offset(0, 2),
+              color: (message.isUser ? primaryYellow : violetAccent).withOpacity(0.15), // Reduced from 0.3
+              blurRadius: 6, // Reduced from 8
+              spreadRadius: 0.5, // Reduced from 1
+              offset: const Offset(0, 1), // Reduced from Offset(0, 2)
             ),
           ],
         ),

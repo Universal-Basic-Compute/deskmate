@@ -30,7 +30,7 @@ class BackgroundContainer extends StatelessWidget {
         // Light cone overlay
         const LightConeGradient(
           lightColor: primaryYellow,
-          intensity: 0.15,
+          intensity: 0.08, // Reduced from 0.15
           alignment: Alignment.topCenter,
           child: SizedBox.expand(),
         ),

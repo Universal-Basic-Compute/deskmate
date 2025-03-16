@@ -17,8 +17,8 @@ class SessionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: primaryYellow.withOpacity(0.3),
-            blurRadius: 15,
+            color: primaryYellow.withOpacity(0.15), // Reduced from 0.3
+            blurRadius: 10, // Reduced from 15
             spreadRadius: 1,
             offset: const Offset(0, 2),
           ),

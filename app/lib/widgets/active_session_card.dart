@@ -20,9 +20,9 @@ class ActiveSessionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: violetAccent.withOpacity(0.3),
-            blurRadius: 20,
-            spreadRadius: 2,
+            color: violetAccent.withOpacity(0.15), // Reduced from 0.3
+            blurRadius: 15, // Reduced from 20
+            spreadRadius: 1, // Reduced from 2
           ),
         ],
       ),
@@ -35,7 +35,7 @@ class ActiveSessionCard extends StatelessWidget {
         ),
         child: LightConeGradient(
           lightColor: violetAccent,
-          intensity: 0.1,
+          intensity: 0.05, // Reduced from 0.1
           alignment: Alignment.topCenter,
           child: Padding(
             padding: const EdgeInsets.all(20.0),

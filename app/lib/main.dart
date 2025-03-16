@@ -60,10 +60,10 @@ class DeskMateApp extends StatelessWidget {
                       animation: animation,
                       builder: (context, _) {
                         return Opacity(
-                          opacity: animation.value * 0.7,
+                          opacity: animation.value * 0.5, // Reduced from 0.7
                           child: LightConeGradient(
                             lightColor: primaryYellow,
-                            intensity: 0.3 * animation.value,
+                            intensity: 0.15 * animation.value, // Reduced from 0.3
                             alignment: Alignment.center,
                             child: const SizedBox.expand(),
                           ),

@@ -12,9 +12,9 @@ class AssistantFab extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: primaryYellow.withOpacity(0.3),
-            blurRadius: 12,
-            spreadRadius: 2,
+            color: primaryYellow.withOpacity(0.15), // Reduced from 0.3
+            blurRadius: 8, // Reduced from 12
+            spreadRadius: 1, // Reduced from 2
           ),
         ],
       ),

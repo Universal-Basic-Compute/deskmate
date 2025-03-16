@@ -26,9 +26,9 @@ class WelcomeHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: primaryYellow.withOpacity(0.3),
-                    blurRadius: 30,
-                    spreadRadius: 5,
+                    color: primaryYellow.withOpacity(0.15), // Reduced from 0.3
+                    blurRadius: 20, // Reduced from 30
+                    spreadRadius: 3, // Reduced from 5
                   ),
                 ],
               ),
