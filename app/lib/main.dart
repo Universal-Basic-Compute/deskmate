@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'models/session_model.dart';
@@ -9,7 +10,19 @@ import 'theme/app_theme.dart';
 import 'widgets/light_cone_gradient.dart';
 
 void main() {
-  runApp(const DeskMateApp());
+  // Add error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    print('Flutter error: ${details.exception}');
+  };
+  
+  // Catch other errors
+  runZonedGuarded(() {
+    runApp(const DeskMateApp());
+  }, (Object error, StackTrace stack) {
+    print('Caught error: $error');
+    print(stack);
+  });
 }
 
 class DeskMateApp extends StatelessWidget {

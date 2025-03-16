@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,6 +26,8 @@ class ChatService {
 
   Future<String> sendMessage(String message, String username) async {
     try {
+      print('Sending message to API: $message'); // Add logging
+      
       // Make a direct API call without using the CORS proxy
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -37,14 +40,18 @@ class ChatService {
           'username': username,
           'character': 'DeskMate',
         }),
-      );
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final botResponse = data['response'] as String;
+        final botResponse = data['response'] as String? ?? 'No response received';
         
         // Speak the response
-        await speakResponse(botResponse);
+        try {
+          await speakResponse(botResponse);
+        } catch (e) {
+          print('TTS error: $e'); // Just log TTS errors, don't fail the whole function
+        }
         
         return botResponse;
       } else {
@@ -66,6 +73,12 @@ class ChatService {
       
       _isPlaying = true;
       
+      // Temporarily disable TTS to avoid potential crashes
+      print('TTS would speak: $text');
+      _isPlaying = false;
+      return;
+      
+      /*
       if (kIsWeb) {
         // Web platform handling with direct API call
         final response = await http.post(
@@ -79,7 +92,7 @@ class ChatService {
             'voiceId': 'IKne3meq5aSn9XLyUdCD',
             'model': 'eleven_flash_v2_5'
           }),
-        );
+        ).timeout(const Duration(seconds: 10));
         
         if (response.statusCode == 200) {
           final blob = html.Blob([response.bodyBytes]);
@@ -109,7 +122,7 @@ class ChatService {
             'voiceId': 'IKne3meq5aSn9XLyUdCD',
             'model': 'eleven_flash_v2_5'
           }),
-        );
+        ).timeout(const Duration(seconds: 10));
         
         if (response.statusCode == 200) {
           // Get temporary directory to save the audio file
@@ -127,6 +140,7 @@ class ChatService {
           _isPlaying = false;
         }
       }
+      */
     } catch (e) {
       print('Error using TTS API: $e');
       _isPlaying = false;
