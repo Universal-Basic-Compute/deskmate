@@ -144,36 +144,95 @@ class ChatService {
     try {
       print('Sending image to API: $imagePath');
       
-      // Create multipart request
-      final request = http.MultipartRequest('POST', Uri.parse('https://mydeskmate.ai/api/screenshot'));
-      
-      // Add file
-      final file = await http.MultipartFile.fromPath('image', imagePath);
-      request.files.add(file);
-      
-      // Add other fields
-      request.fields['username'] = username;
-      request.fields['character'] = 'DeskMate';
-      
-      // Send request
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
-      final response = await http.Response.fromStream(streamedResponse);
-      
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final botResponse = data['response'] as String? ?? 'No response received';
+      if (kIsWeb) {
+        // Web implementation - use XHR or fetch directly
+        // For web, imagePath is actually a data URL or blob URL
         
-        // Speak the response
-        try {
-          await speakResponse(botResponse);
-        } catch (e) {
-          print('TTS error: $e');
-        }
+        // Create a FormData object using html
+        final formData = html.FormData();
         
-        return botResponse;
+        // For web, we need to fetch the blob from the URL
+        final response = await http.get(Uri.parse(imagePath));
+        
+        // Create a blob from the response
+        final blob = html.Blob([response.bodyBytes], 'image/jpeg');
+        
+        // Add the blob to the form data
+        formData.appendBlob('image', blob, 'image.jpg');
+        
+        // Add other fields
+        formData.append('username', username);
+        formData.append('character', 'DeskMate');
+        
+        // Create an XMLHttpRequest
+        final xhr = html.HttpRequest();
+        xhr.open('POST', 'https://mydeskmate.ai/api/screenshot');
+        
+        // Create a completer to handle the async response
+        final completer = Completer<String>();
+        
+        // Set up event handlers
+        xhr.onLoad.listen((_) {
+          if (xhr.status == 200) {
+            final data = jsonDecode(xhr.responseText);
+            final botResponse = data['response'] as String? ?? 'No response received';
+            
+            // Speak the response
+            try {
+              speakResponse(botResponse);
+            } catch (e) {
+              print('TTS error: $e');
+            }
+            
+            completer.complete(botResponse);
+          } else {
+            print('API error: ${xhr.status} - ${xhr.responseText}');
+            completer.complete('Sorry, I encountered an error processing your image. Please try again later.');
+          }
+        });
+        
+        xhr.onError.listen((_) {
+          print('XHR error');
+          completer.complete('Sorry, I\'m having trouble processing your image. Please check your internet connection.');
+        });
+        
+        // Send the request
+        xhr.send(formData);
+        
+        // Return the future from the completer
+        return completer.future;
       } else {
-        print('API error: ${response.statusCode} - ${response.body}');
-        return 'Sorry, I encountered an error processing your image. Please try again later.';
+        // Mobile implementation - use MultipartRequest
+        final request = http.MultipartRequest('POST', Uri.parse('https://mydeskmate.ai/api/screenshot'));
+        
+        // Add file
+        final file = await http.MultipartFile.fromPath('image', imagePath);
+        request.files.add(file);
+        
+        // Add other fields
+        request.fields['username'] = username;
+        request.fields['character'] = 'DeskMate';
+        
+        // Send request
+        final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+        final response = await http.Response.fromStream(streamedResponse);
+        
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final botResponse = data['response'] as String? ?? 'No response received';
+          
+          // Speak the response
+          try {
+            await speakResponse(botResponse);
+          } catch (e) {
+            print('TTS error: $e');
+          }
+          
+          return botResponse;
+        } else {
+          print('API error: ${response.statusCode} - ${response.body}');
+          return 'Sorry, I encountered an error processing your image. Please try again later.';
+        }
       }
     } catch (e) {
       print('Image request error: $e');
