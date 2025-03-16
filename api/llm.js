@@ -1,7 +1,7 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { handleCors, validateMethod } = require('./utils/common');
+const { handleCors, validateMethod } = require('./common');
 
 module.exports = async function handler(req, res) {
   console.log('LLM API handler called');

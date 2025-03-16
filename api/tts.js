@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { handleCors, validateMethod } = require('./utils/common');
+const { handleCors, validateMethod } = require('./common');
 
 module.exports = async function handler(req, res) {
   console.log('TTS API handler called');

@@ -1,4 +1,4 @@
-const { handleCors, validateMethod } = require('./utils/common');
+const { handleCors, validateMethod } = require('./common');
 
 module.exports = async function handler(req, res) {
   console.log('Screenshot API handler called');
