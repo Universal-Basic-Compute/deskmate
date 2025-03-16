@@ -145,59 +145,73 @@ class ChatService {
       print('Sending image to API: $imagePath');
       
       if (kIsWeb) {
-        // Web implementation - use XHR or fetch directly
-        // For web, imagePath is actually a data URL or blob URL
-        
-        // Create a FormData object using html
-        final formData = html.FormData();
-        
-        // For web, we need to fetch the blob from the URL
-        final response = await http.get(Uri.parse(imagePath));
-        
-        // Create a blob from the response
-        final blob = html.Blob([response.bodyBytes], 'image/jpeg');
-        
-        // Add the blob to the form data with the correct field name 'screenshot'
-        formData.appendBlob('screenshot', blob, 'image.jpg');
-        
-        // Add other fields
-        formData.append('username', username);
-        formData.append('character', 'DeskMate');
-        
-        // Create an XMLHttpRequest
-        final xhr = html.HttpRequest();
-        xhr.open('POST', 'https://mydeskmate.ai/api/screenshot');
+        // Web implementation - use fetch API with proper blob handling
         
         // Create a completer to handle the async response
         final completer = Completer<String>();
         
-        // Set up event handlers
-        xhr.onLoad.listen((_) {
+        // For web, we need to convert the blob URL to actual binary data
+        final xhr = html.HttpRequest();
+        xhr.responseType = 'blob';
+        xhr.open('GET', imagePath);
+        
+        xhr.onLoad.listen((_) async {
           if (xhr.status == 200) {
-            final data = jsonDecode(xhr.responseText ?? '{"response": "No response received"}');
-            final botResponse = data['response'] as String? ?? 'No response received';
+            final blob = xhr.response as html.Blob;
             
-            // Speak the response
-            try {
-              speakResponse(botResponse);
-            } catch (e) {
-              print('TTS error: $e');
-            }
+            // Create a FormData object
+            final formData = html.FormData();
             
-            completer.complete(botResponse);
+            // Add the blob to the form data with the correct field name 'screenshot'
+            formData.appendBlob('screenshot', blob, 'image.jpg');
+            
+            // Add other fields
+            formData.append('username', username);
+            formData.append('character', 'DeskMate');
+            
+            // Send the actual request with the image data
+            final uploadXhr = html.HttpRequest();
+            uploadXhr.open('POST', 'https://mydeskmate.ai/api/screenshot');
+            
+            uploadXhr.onLoad.listen((_) {
+              if (uploadXhr.status == 200) {
+                final data = jsonDecode(uploadXhr.responseText ?? '{"response": "No response received"}');
+                final botResponse = data['response'] as String? ?? 'No response received';
+                
+                // Speak the response
+                try {
+                  speakResponse(botResponse);
+                } catch (e) {
+                  print('TTS error: $e');
+                }
+                
+                completer.complete(botResponse);
+              } else {
+                print('API error: ${uploadXhr.status} - ${uploadXhr.responseText}');
+                completer.complete('Sorry, I encountered an error processing your image. Please try again later.');
+              }
+            });
+            
+            uploadXhr.onError.listen((_) {
+              print('Upload XHR error');
+              completer.complete('Sorry, I\'m having trouble processing your image. Please check your internet connection.');
+            });
+            
+            // Send the request with the form data
+            uploadXhr.send(formData);
           } else {
-            print('API error: ${xhr.status} - ${xhr.responseText}');
-            completer.complete('Sorry, I encountered an error processing your image. Please try again later.');
+            print('Blob fetch error: ${xhr.status}');
+            completer.complete('Sorry, I couldn\'t process the image. Please try again.');
           }
         });
         
         xhr.onError.listen((_) {
-          print('XHR error');
-          completer.complete('Sorry, I\'m having trouble processing your image. Please check your internet connection.');
+          print('Blob XHR error');
+          completer.complete('Sorry, I\'m having trouble accessing your image. Please try again.');
         });
         
-        // Send the request
-        xhr.send(formData);
+        // Send the request to get the blob
+        xhr.send();
         
         // Return the future from the completer
         return completer.future;
