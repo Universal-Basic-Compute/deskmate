@@ -1,8 +1,8 @@
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   
-  // Intercept requests to mydeskmate.ai or duogaming.ai
-  if (url.hostname === 'mydeskmate.ai' || url.hostname === 'duogaming.ai') {
+  // Intercept requests to mydeskmate.ai only
+  if (url.hostname === 'mydeskmate.ai') {
     // Clone the original request
     const originalRequest = event.request.clone();
     
