@@ -174,7 +174,7 @@ class ChatService {
         // Set up event handlers
         xhr.onLoad.listen((_) {
           if (xhr.status == 200) {
-            final data = jsonDecode(xhr.responseText);
+            final data = jsonDecode(xhr.responseText ?? '{"response": "No response received"}');
             final botResponse = data['response'] as String? ?? 'No response received';
             
             // Speak the response
