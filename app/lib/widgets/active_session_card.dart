@@ -39,57 +39,43 @@ class ActiveSessionCard extends StatelessWidget {
           alignment: Alignment.topCenter,
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                // Chat interface
-                const SizedBox(
-                  height: 400, // Increased height since we removed other elements
-                  child: ChatInterface(),
-                ),
-                
-                const SizedBox(height: 16),
-                // End session button with glow
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    gradient: const LinearGradient(
-                      colors: [Colors.redAccent, Color(0xFFFF5252)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                // Main content
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Chat interface with padding to make room for the back button
+                    const Padding(
+                      padding: EdgeInsets.only(top: 24.0),
+                      child: SizedBox(
+                        height: 400,
+                        child: ChatInterface(),
+                      ),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.redAccent.withOpacity(0.3),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => sessionModel.endSession(),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.stop, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              'End Session',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                  ],
+                ),
+              
+                // Back button
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: darkGrey.withOpacity(0.7),
+                      boxShadow: [
+                        BoxShadow(
+                          color: violetAccent.withOpacity(0.2),
+                          blurRadius: 8,
+                          spreadRadius: 1,
                         ),
-                      ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => sessionModel.endSession(),
+                      tooltip: 'Back to menu',
                     ),
                   ),
                 ),
