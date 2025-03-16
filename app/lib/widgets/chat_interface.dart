@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
@@ -146,11 +147,31 @@ class _ChatInterfaceState extends State<ChatInterface> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.file(
-              File(image.path),
-              height: 200,
-              fit: BoxFit.cover,
-            ),
+            // Check if running on web
+            kIsWeb
+                ? Image.network(
+                    image.path,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        color: Colors.grey[800],
+                        child: const Center(
+                          child: Icon(
+                            Icons.image,
+                            color: Colors.white70,
+                            size: 40,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Image.file(
+                    File(image.path),
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
           ],
         ),
         actions: [
@@ -367,15 +388,7 @@ class _ChatInterfaceState extends State<ChatInterface> {
           ],
         ),
         child: message.imagePath != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(message.imagePath!),
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              )
+            ? _buildImageContent(message.imagePath!)
             : Text(
                 message.content,
                 style: TextStyle(
@@ -386,5 +399,46 @@ class _ChatInterfaceState extends State<ChatInterface> {
               ),
       ),
     );
+  }
+
+  Widget _buildImageContent(String imagePath) {
+    // Check if running on web
+    if (kIsWeb) {
+      // For web, use a network image or a placeholder
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          imagePath,
+          width: 200,
+          height: 200,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 200,
+              height: 200,
+              color: Colors.grey[800],
+              child: const Center(
+                child: Icon(
+                  Icons.image,
+                  color: Colors.white70,
+                  size: 40,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      // For mobile, use file image
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.file(
+          File(imagePath),
+          width: 200,
+          height: 200,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
   }
 }
