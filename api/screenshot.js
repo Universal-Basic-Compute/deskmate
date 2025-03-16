@@ -1,5 +1,5 @@
+const axios = require('axios');
 const { handleCors, validateMethod } = require('./common');
-const formidable = require('formidable');
 
 module.exports = async function handler(req, res) {
   console.log('Screenshot API handler called');
@@ -20,29 +20,54 @@ module.exports = async function handler(req, res) {
   try {
     console.log('Processing screenshot request');
     
-    // Use formidable to parse multipart form data
-    const form = new formidable.IncomingForm();
+    // Check if we have screenshot data
+    if (!req.body || !req.body.screenshot) {
+      console.error('No screenshot data found in request');
+      return res.status(400).json({ error: 'Screenshot data is required' });
+    }
+
+    // Extract data from request
+    const { screenshot, username = 'anonymous', message = "I've sent you a picture. Can you help me with this?" } = req.body;
     
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        console.error('Error parsing form data:', err);
-        return res.status(500).json({ error: 'Error processing form data' });
+    console.log('Screenshot received, data length:', screenshot.length);
+    console.log('Username:', username);
+    console.log('Message:', message);
+
+    // Call the LLM API with the screenshot
+    const llmResponse = await axios({
+      method: 'POST',
+      url: `https://${req.headers.host}/api/llm`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        messages: [
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        images: [
+          {
+            data: screenshot,
+            media_type: 'image/jpeg'
+          }
+        ]
       }
-      
-      // Check if we have screenshot data
-      if (!files || !files.screenshot) {
-        console.error('No screenshot file found in request');
-        return res.status(400).json({ error: 'Screenshot data is required' });
-      }
-      
-      // Process the image and return a response
-      console.log('Screenshot received successfully');
-      
-      // For now, just return a mock response
-      return res.status(200).json({ 
-        response: "I've analyzed your image. This appears to be a math problem involving quadratic equations. Would you like me to help you solve it step by step?",
-        success: true 
-      });
+    });
+
+    console.log('LLM API response status:', llmResponse.status);
+    
+    // Extract bot response
+    let botResponse = "I'm sorry, I couldn't analyze the image at this time.";
+    if (llmResponse.data.content && Array.isArray(llmResponse.data.content) && llmResponse.data.content.length > 0) {
+      botResponse = llmResponse.data.content[0].text;
+    }
+
+    // Return the LLM response
+    return res.status(200).json({ 
+      success: true,
+      response: botResponse
     });
   } catch (error) {
     console.error('Screenshot API error:', error.message);
