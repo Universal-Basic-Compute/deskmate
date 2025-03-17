@@ -46,3 +46,6 @@ app.*.map.json
 .env
 .aider*
 .vercel
+
+# Node.js
+node_modules/
